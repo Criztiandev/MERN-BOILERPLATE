@@ -11,7 +11,7 @@ export const AccountValidation = z.object({
     .min(1, "Last name is too short")
     .max(64, "Last name is too long"),
 
-  birthDate: z.date(),
+  bod: z.date(),
   gender: z.enum(["male", "female"]),
 
   email: z.string().min(1, "Email is too short").max(64, "Email is too long"),
@@ -20,3 +20,24 @@ export const AccountValidation = z.object({
     .min(8, "Password is too short")
     .max(16, "Password is too long"),
 });
+
+export const PersonalInfoValidation = AccountValidation.pick({
+  firstName: true,
+  lastName: true,
+});
+
+export const OtherInfoValidation = AccountValidation.pick({
+  bod: true,
+  gender: true,
+});
+
+export const AccountInfoValidation = AccountValidation.pick({
+  email: true,
+  password: true,
+});
+
+export const AccountValidationList = [
+  PersonalInfoValidation,
+  OtherInfoValidation,
+  AccountInfoValidation,
+];
