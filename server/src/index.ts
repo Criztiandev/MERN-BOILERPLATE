@@ -7,6 +7,8 @@ import Routes from "./routes";
 import cors from "cors";
 import { morganSetup } from "./config/morgan.config";
 import connectDB from "./config/connectDb";
+import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
 
 dotenv.config();
 connectDB();
@@ -34,9 +36,11 @@ app.use(
     cookie: {
       maxAge: 60000 * 60,
     },
+    store: MongoStore.create({
+      client: mongoose.connection.getClient() as any,
+    }),
   })
 );
-
 morganSetup(app);
 Routes(app);
 
