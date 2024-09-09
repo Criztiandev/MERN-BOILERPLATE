@@ -1,13 +1,15 @@
 import express, { Request, Response } from "express";
-import authRoutes from "./routes/auth.routes";
-import accountRoutes from "./routes/account.routes";
 import { errorHandler, notFound } from "./utils/error.utils";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import dotenv from "dotenv";
 import Routes from "./routes";
+import cors from "cors";
+import { morganSetup } from "./config/morgan.config";
+import connectDB from "./config/connectDb";
 
 dotenv.config();
+connectDB();
 
 if (!process.env.SESSION_SECRET)
   throw new Error("SESSION SECRET IS NOT DEFINED");
@@ -19,6 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+app.use(cors({ origin: "*", credentials: true }));
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -32,6 +37,7 @@ app.use(
   })
 );
 
+morganSetup(app);
 Routes(app);
 
 app.use(notFound);
