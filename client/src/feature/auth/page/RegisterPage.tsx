@@ -6,23 +6,40 @@ import { Card } from "@/common/components/ui/card";
 import { FormBase } from "@/common/components/ui/form";
 import { XStack, YStack } from "@/common/components/ui/stack";
 import useMultiForm from "@/common/hooks/helper/useMultiform";
-import { User } from "@/feature/shared/interface";
+import { IAccount } from "@/feature/shared/interface";
 import { EyeIcon, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AccountValidationList } from "@/feature/shared/validation/account.validation";
 
 const RegisterPage = () => {
-  const { element, isFistStep, isLastStep, nextStep, prevStep } = useMultiForm([
-    <PersonalInfoStep />,
-    <OtherInfoStep />,
-    <AccountInfoStep />,
-  ]);
-  const form = useForm({
-    defaultValues: { email: "", password: "" },
+  const { element, isFistStep, currentStep, isLastStep, nextStep, prevStep } =
+    useMultiForm([
+      <PersonalInfoStep />,
+      <OtherInfoStep />,
+      <AccountInfoStep />,
+    ]);
+
+  const form = useForm<IAccount>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      bod: undefined,
+      email: "",
+      password: "",
+    },
+    resolver: zodResolver(AccountValidationList[currentStep]),
   });
 
-  const onSubmit = (value: Pick<User, "email" | "password">) => {
-    console.log(value);
+  const onSubmit = () => {
+    if (!isLastStep) {
+      nextStep();
+      return;
+    }
+
+    const result = form.getValues();
+    console.log(result);
   };
 
   return (
@@ -45,11 +62,8 @@ const RegisterPage = () => {
                     {element}
 
                     <YStack className="gap-4 my-4">
-                      <Button
-                        type={isLastStep ? "submit" : "button"}
-                        onClick={() => nextStep()}
-                      >
-                        Next
+                      <Button type={"submit"}>
+                        {isLastStep ? "Submit" : "Next"}
                       </Button>
                       {!isFistStep && (
                         <Button
