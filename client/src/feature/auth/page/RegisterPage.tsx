@@ -31,10 +31,17 @@ const RegisterPage = () => {
         <div className=""></div>
         <div className="flex justify-center items-center  p-4 border w-full">
           <div className="max-w-[500px] w-full">
-            <div className="  p-4 min-w-[350px] w-full  rounded-md">
+            <div className="  p-4 w-full  rounded-md">
               <YStack className="gap-2 mb-8">
                 <h1 className="text-3xl font-bold">Create an Account</h1>
-                <span>We would like to know you</span>
+                <div className="space-x-2">
+                  <span>
+                    Start your website in seconds. Already have an account?
+                  </span>
+                  <a href="/" className="text-blue-600">
+                    Login Here
+                  </a>
+                </div>
               </YStack>
               <FormBase {...form}>
                 <form
@@ -80,25 +87,22 @@ const RegisterPage = () => {
                     placeholder="Enter your Password"
                   />
 
-                  <XStack className="items-center my-1">
-                    <XStack className="gap-2 items-center ">
+                  <XStack className="gap-3 items-start my-4">
+                    <span>
                       <Checkbox />
-                      <XStack className="space-x-2">
-                        <span>I accept</span>
-                        <a href="#" className="text-blue-600">
-                          Terms and Condition
-                        </a>
-                      </XStack>
-                    </XStack>
+                    </span>
+                    <span>
+                      By signing up, you are creating a Flowbite account, and
+                      you agree to Flowbite’s Terms of Use and Privacy Policy.
+                    </span>
                   </XStack>
 
-                  <Button className="mb-8">Login</Button>
-                  <XStack className="gap-2 items-center justify-center">
-                    <span>Don't have an account</span>
-                    <a href="/register" className="text-blue-600">
-                      Create an account
-                    </a>
+                  <XStack className="gap-3 items-center">
+                    <Checkbox />
+                    <span>Email me about product updates and resources.</span>
                   </XStack>
+
+                  <Button className="mb-8">Create an Account</Button>
                 </form>
               </FormBase>
             </div>
