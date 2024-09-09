@@ -8,6 +8,8 @@ declare global {
       COOKIE_SECRET: string;
       ENCRYPTION_KEY_32: string;
       ENCRYPTION_KEY_16: string;
+      ACCESS_TOKEN_EXPIRATION: string;
+      REFRESH_TOKEN_EXPIRATION: string;
     }
   }
 }
