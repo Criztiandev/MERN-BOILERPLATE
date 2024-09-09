@@ -56,15 +56,16 @@ export const DatePickerField = ({ label, name, description }: Props) => {
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col">
-          <FormLabel>{label}</FormLabel>
+        <FormItem className="w-full">
+          {label && <FormLabel>{label}</FormLabel>}
+          <br />
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "pl-3 text-left font-normal",
+                    "pl-3 text-left font-normal w-full",
                     !field.value && "text-muted-foreground"
                   )}
                 >

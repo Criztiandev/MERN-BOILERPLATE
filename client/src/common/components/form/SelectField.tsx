@@ -48,7 +48,10 @@ const SelectField: FC<Props> = ({
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder={placeholder} />
+                <SelectValue
+                  placeholder={placeholder}
+                  className="placeholder:text-muted-foreground"
+                />
               </SelectTrigger>
             </FormControl>
             {options?.length > 0 && (
