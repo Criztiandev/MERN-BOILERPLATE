@@ -1,8 +1,12 @@
 import { ObjectId } from "mongoose";
-import { IAccount } from "../interface/account.interface";
+import { IAccount, ILoginCredentials } from "../interface/account.interface";
 import AccountRepository from "../repository/account.repository";
 import EncryptionUtils from "../utils/encryption.utils";
-import { AccountValidation } from "../validation/account.validation";
+import {
+  AccountValidation,
+  loginValidation,
+} from "../validation/account.validation";
+import tokenUtils from "../utils/token.utils";
 
 class AccountService {
   private repository: AccountRepository;
@@ -38,6 +42,51 @@ class AccountService {
     if (!createdCredentials) throw new Error("Create account failed`");
 
     return createdCredentials._id as ObjectId;
+  }
+
+  async loginAccount(credentials: ILoginCredentials) {
+    const { email, password } = credentials;
+
+    const validatedPayload = await loginValidation.safeParseAsync(credentials);
+
+    if (!validatedPayload.success) {
+      const path = validatedPayload.error.issues[0].path[0].toString();
+      throw new Error(`${path} ${validatedPayload.error.issues[0].message}`);
+    }
+
+    const accountCredentials = await this.repository.findOne({ email });
+
+    if (!accountCredentials)
+      throw new Error("Account does'nt exist, Please register");
+
+    const isPasswordCorrect = await EncryptionUtils.comparePassword(
+      password,
+      accountCredentials?.password
+    );
+
+    if (!isPasswordCorrect)
+      throw new Error("Incorrect Password, Please try again later");
+
+    const payload = {
+      id: accountCredentials?._id,
+      fullName: `${accountCredentials.firstName} ${accountCredentials.lastName}`,
+      email,
+      role: accountCredentials?.role,
+    };
+
+    const accessToken = tokenUtils.generateToken<any>(
+      payload,
+      process.env.ACCESS_TOKEN_EXPIRATION
+    );
+    const refreshToken = tokenUtils.generateToken<any>(
+      payload,
+      process.env.REFRESH_TOKEN_EXPIRATION
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }
 

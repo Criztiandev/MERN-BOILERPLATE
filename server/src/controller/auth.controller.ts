@@ -25,29 +25,14 @@ class AccountController {
 
   login = expressAsyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { email, password } = req.body;
-
-      const isPasswordCorrect = await EncryptionUtils.comparePassword(
-        password,
-        "$2b$10$4iV4B6HW95rZ6KllNaLFUOeBSn/fCd10kJldWwvfuxWqjf5OJyTKm"
-      );
-
-      if (!isPasswordCorrect)
-        throw new Error("Incorrect Password, Please try again later");
-
-      const payload = { id: "#1223", email };
-
-      // generate here the sessoion
-      const currentSession = 0;
-
-      const accessToken = tokenUtils.generateToken<any>(payload, "5s");
-      const refreshToken = tokenUtils.generateToken<any>(payload, "1yr");
+      const { accessToken, refreshToken } =
+        await this.accountService.loginAccount(req.body);
 
       req.session.accessToken = accessToken;
       req.session.refreshToken = refreshToken;
 
       res.status(200).json({
-        payload,
+        accessToken,
         message: "Login successfully",
       });
     }
