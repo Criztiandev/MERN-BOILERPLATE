@@ -23,7 +23,7 @@ const LoginPage = () => {
           <div className="flex justify-center items-center   p-4 rounded-md">
             <div className="  p-4 min-w-[350px] rounded-md">
               <YStack className="gap-2 mb-8">
-                <h1 className="text-3xl font-bold">Login in to your Account</h1>
+                <h1 className="text-3xl font-bold">Login in </h1>
                 <span>Welcome back, Select method to login</span>
               </YStack>
               <FormBase {...form}>
@@ -51,13 +51,15 @@ const LoginPage = () => {
                       <span>Remember me</span>
                     </XStack>
 
-                    <a href="#">Forgot password</a>
+                    <a href="/forgot-password">Forgot password</a>
                   </XStack>
 
                   <Button className="mb-8">Login</Button>
                   <XStack className="gap-2 items-center justify-center">
                     <span>Don't have an account</span>
-                    <a href="#">Create an account</a>
+                    <a href="/register" className="text-blue-600">
+                      Create an account
+                    </a>
                   </XStack>
                 </form>
               </FormBase>
