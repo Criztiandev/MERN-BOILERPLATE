@@ -2,6 +2,7 @@ import InputField from "@/common/components/form/InputField";
 import { Button } from "@/common/components/ui/button";
 import { Checkbox } from "@/common/components/ui/checkbox";
 import { FormBase } from "@/common/components/ui/form";
+import { SelectSeparator } from "@/common/components/ui/select";
 import { XStack, YStack } from "@/common/components/ui/stack";
 import { User } from "@/feature/shared/interface";
 import { useForm } from "react-hook-form";
@@ -20,11 +21,10 @@ const LoginPage = () => {
       <div className="h-full grid grid-cols-2 gap-4">
         <div className=""></div>
         <div className="flex justify-center items-center  p-4">
-          <div className="flex justify-center items-center   p-4 rounded-md">
-            <div className="  p-4 min-w-[350px] rounded-md">
+          <div className=" w-full max-w-[400px]">
+            <div className=" w-full">
               <YStack className="gap-2 mb-8">
-                <h1 className="text-3xl font-bold">Login in </h1>
-                <span>Welcome back, Select method to login</span>
+                <h1 className="text-3xl font-bold">Sign in to your account</h1>
               </YStack>
               <FormBase {...form}>
                 <form
@@ -44,6 +44,17 @@ const LoginPage = () => {
                     name="password"
                     placeholder="Enter your Password"
                   />
+
+                  <SelectSeparator />
+
+                  <XStack className="justify-center items-center gap-4">
+                    <Button variant="outline" className="w-full">
+                      Google
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      Github
+                    </Button>
+                  </XStack>
 
                   <XStack className="justify-between items-center">
                     <XStack className="gap-2 items-center">
