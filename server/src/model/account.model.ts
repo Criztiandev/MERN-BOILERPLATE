@@ -1,9 +1,9 @@
 import mongoose, { Document } from "mongoose";
 import { IAccount } from "../interface/account.interface";
 
-interface IDocument extends Document, IAccount {}
+export interface IAccountDocument extends Document, IAccount {}
 
-const accountSchema = new mongoose.Schema<IDocument>({
+const accountSchema = new mongoose.Schema<IAccountDocument>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   bod: { type: String, required: true },
@@ -18,4 +18,17 @@ const accountSchema = new mongoose.Schema<IDocument>({
   },
 });
 
-export default mongoose.model("account", accountSchema);
+// Pre-save hook to lowercase string fields
+accountSchema.pre("save", function (next) {
+  const doc = this as IAccountDocument;
+
+  // Lowercase specific fields
+  doc.firstName = doc.firstName.toLowerCase();
+  doc.lastName = doc.lastName.toLowerCase();
+  doc.email = doc.email.toLowerCase();
+  doc.role = doc?.role?.toLowerCase() || "user";
+
+  next();
+});
+
+export default mongoose.model<IAccountDocument>("account", accountSchema);

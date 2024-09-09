@@ -4,32 +4,20 @@ import tokenUtils from "../utils/token.utils";
 import EncryptionUtils from "../utils/encryption.utils";
 import accountModel from "../model/account.model";
 import { AccountValidation } from "../validation/account.validation";
+import AccountService from "../service/account.service";
 
 class AccountController {
-  private model: typeof accountModel;
+  private accountService: AccountService;
   constructor() {
-    this.model = accountModel;
+    this.accountService = new AccountService();
   }
 
   register = expressAsyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { email, password } = req.body;
+      const account = await this.accountService.createAccount(req.body);
 
-      // validate
-      const validatedPayload = await AccountValidation.safeParseAsync(req.body);
-
-      if (!validatedPayload.success) {
-        const path = validatedPayload.error.issues[0].path[0].toString();
-        throw new Error(`${path} ${validatedPayload.error.issues[0].message}`);
-      }
-
-      const credentials = await this.model.findOne({ $or: [{ email }] });
-      if (credentials) throw new Error("Account already exist");
-
-      const hashedPassword = await EncryptionUtils.hashPassword(password);
-
-      res.status(200).json({
-        payload: hashedPassword,
+      res.status(201).json({
+        payload: account,
         message: "Registered Successfully",
       });
     }
