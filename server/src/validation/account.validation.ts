@@ -20,3 +20,8 @@ export const AccountValidation = z.object({
     .min(8, "Password is too short")
     .max(16, "Password is too long"),
 });
+
+export const loginValidation = AccountValidation.pick({
+  email: true,
+  password: true,
+});
