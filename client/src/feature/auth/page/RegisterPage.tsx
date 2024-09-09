@@ -7,12 +7,15 @@ import { FormBase } from "@/common/components/ui/form";
 import { XStack, YStack } from "@/common/components/ui/stack";
 import useMultiForm from "@/common/hooks/helper/useMultiform";
 import { User } from "@/feature/shared/interface";
+import { EyeIcon, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 const RegisterPage = () => {
   const { element, isFistStep, isLastStep, nextStep, prevStep } = useMultiForm([
     <PersonalInfoStep />,
     <OtherInfoStep />,
+    <AccountInfoStep />,
   ]);
   const form = useForm({
     defaultValues: { email: "", password: "" },
@@ -112,6 +115,35 @@ const OtherInfoStep = () => {
           { label: "Male", value: "male" },
           { label: "Female", value: "female" },
         ]}
+      />
+    </div>
+  );
+};
+
+const AccountInfoStep = () => {
+  const [isShowPassword, setIsShowPassword] = useState(false);
+  return (
+    <div className="flex flex-col gap-2">
+      <InputField
+        type="email"
+        label="Email"
+        name="email"
+        placeholder="Enter your Email"
+      />
+      <InputField
+        type={isShowPassword ? "text" : "password"}
+        label="Password"
+        name="password"
+        placeholder="Enter your Password"
+        icon={
+          isShowPassword ? (
+            <EyeOff size={22} opacity={0.5} />
+          ) : (
+            <EyeIcon size={22} opacity={0.5} />
+          )
+        }
+        dir="right"
+        onPress={() => setIsShowPassword((prev) => !prev)}
       />
     </div>
   );
