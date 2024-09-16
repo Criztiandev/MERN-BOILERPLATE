@@ -1,5 +1,6 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { MutationOptions, QueryKey, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface ErrorResponse {
   error: string;
@@ -41,7 +42,7 @@ function useMutate<T>({
       if (onError) {
         onError(error, variables, context);
       }
-
+      toast.error(errorMessage);
       throw new Error(errorMessage);
     },
   });
