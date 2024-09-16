@@ -4,7 +4,9 @@ import { Checkbox } from "@/common/components/ui/checkbox";
 import { FormBase } from "@/common/components/ui/form";
 import { SelectSeparator } from "@/common/components/ui/select";
 import { XStack, YStack } from "@/common/components/ui/stack";
-import { User } from "@/feature/shared/interface";
+import useMutate from "@/common/hooks/useMutate";
+import { PublicAxios } from "@/common/lib/axios/axios.instance";
+import { IAccount, User } from "@/feature/shared/interface";
 import { useForm } from "react-hook-form";
 
 const LoginPage = () => {
@@ -12,8 +14,14 @@ const LoginPage = () => {
     defaultValues: { email: "", password: "" },
   });
 
+  const { isPending, mutate } = useMutate({
+    mutationKey: ["login-account"],
+    mutationFn: async (value: Pick<IAccount, "email" | "password">) =>
+      await PublicAxios.post("/login", value),
+  });
+
   const onSubmit = (value: Pick<User, "email" | "password">) => {
-    console.log(value);
+    mutate(value);
   };
 
   return (
@@ -56,7 +64,9 @@ const LoginPage = () => {
                     <a href="/forgot-password">Forgot password</a>
                   </XStack>
 
-                  <Button className="mb-8">Login</Button>
+                  <Button className="mb-8" disabled={isPending}>
+                    Login
+                  </Button>
                   <XStack className="gap-2 items-center justify-center">
                     <span>Don't have an account</span>
                     <a href="/register" className="text-blue-600">
