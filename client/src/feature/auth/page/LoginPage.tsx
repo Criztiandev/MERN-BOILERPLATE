@@ -47,15 +47,6 @@ const LoginPage = () => {
 
                   <SelectSeparator />
 
-                  <XStack className="justify-center items-center gap-4">
-                    <Button variant="outline" className="w-full">
-                      Google
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      Github
-                    </Button>
-                  </XStack>
-
                   <XStack className="justify-between items-center">
                     <XStack className="gap-2 items-center">
                       <Checkbox />
