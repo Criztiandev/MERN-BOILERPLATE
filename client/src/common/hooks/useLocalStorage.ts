@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 
 type SetItemFunction = <T>(value: T) => void;
-type GetItemFunction = () => string | null;
+type GetItemFunction = () => any | null;
 type RemoveItemFunction = () => void;
 type UpdateItemFunction = (updater: (prevValue: string) => string) => void;
 
@@ -17,7 +17,7 @@ const useLocalStorage = (key: string): UseLocalStorageReturn => {
   const [storedValue, setStoredValue] = useState<string | null>(() => {
     try {
       const item = window.localStorage.getItem(key);
-      return item ? item : null;
+      return item ? JSON.parse(item) : null;
     } catch (error) {
       console.error("Error reading from localStorage:", error);
       return null;
@@ -27,7 +27,7 @@ const useLocalStorage = (key: string): UseLocalStorageReturn => {
   const setItem: SetItemFunction = useCallback(
     (value: any) => {
       try {
-        window.localStorage.setItem(key, value);
+        window.localStorage.setItem(key, JSON.stringify(value));
         setStoredValue(value);
       } catch (error) {
         console.error("Error writing to localStorage:", error);

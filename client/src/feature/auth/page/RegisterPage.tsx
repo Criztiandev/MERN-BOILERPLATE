@@ -4,12 +4,17 @@ import { Button } from "@/common/components/ui/button";
 import { Checkbox } from "@/common/components/ui/checkbox";
 import { FormBase } from "@/common/components/ui/form";
 import { XStack, YStack } from "@/common/components/ui/stack";
-import { IAccount, User } from "@/feature/shared/interface";
+import { IAccount } from "@/feature/shared/interface";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountValidation } from "@/feature/shared/validation/account.validation";
 import { DatePickerField } from "@/common/components/form/DatePickerField";
+import useMutate from "@/common/hooks/useMutate";
+import { PublicAxios } from "@/common/lib/axios/axios.instance";
+import { useNavigate } from "react-router-dom";
+
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const form = useForm<IAccount>({
     defaultValues: {
       firstName: "",
@@ -21,14 +26,27 @@ const RegisterPage = () => {
     resolver: zodResolver(AccountValidation),
   });
 
-  const onSubmit = (value: Pick<User, "email" | "password">) => {
-    console.log(value);
+  const { isPending, mutate } = useMutate<IAccount>({
+    mutationKey: ["account-registration"],
+    mutationFn: async (value: IAccount) =>
+      await PublicAxios.post("/auth/register", value),
+    onSuccess: () => {
+      form.reset();
+      navigate("/");
+    },
+  });
+
+  const onSubmit = (value: IAccount) => {
+    mutate(value);
   };
 
   return (
     <div className="h-screen border ">
       <div className="h-full grid grid-cols-2 gap-4">
+        {/* Design  */}
         <div className=""></div>
+
+        {/* Form */}
         <div className="flex justify-center items-center  p-4 border w-full">
           <div className="max-w-[500px] w-full">
             <div className="  p-4 w-full  rounded-md">
@@ -102,7 +120,9 @@ const RegisterPage = () => {
                     <span>Email me about product updates and resources.</span>
                   </XStack>
 
-                  <Button className="mb-8">Create an Account</Button>
+                  <Button className="mb-8" disabled={isPending}>
+                    Create an Account
+                  </Button>
                 </form>
               </FormBase>
             </div>
