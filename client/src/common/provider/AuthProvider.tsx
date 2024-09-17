@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
@@ -5,66 +6,79 @@ import {
   PropsWithChildren,
   useContext,
   useEffect,
+  useMemo,
+  useCallback,
   useState,
 } from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { useNavigate } from "react-router-dom";
-import { User } from "@/feature/shared/interface";
+import { LoginResponsePayload } from "@/feature/auth/interfaces";
 
 interface AuthContextType {
-  user: User | null;
-  handleLogin: (value: User) => void;
+  user: LoginResponsePayload | null;
+  handleLogin: (value: LoginResponsePayload) => void;
   handleLogout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  handleLogin: () => {},
-  handleLogout: () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return context;
 };
 
 const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
   const { setItem, getItem, removeItem } = useLocalStorage("user");
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
-  const handleLogin = (value: User) => {
-    try {
-      setUser(value);
-      setItem(value);
-    } catch {
-      setUser(null);
-      setItem(null);
-    }
-  };
+  const [user, setUser] = useState<LoginResponsePayload | null>(() => {
+    const savedUser = getItem();
+    return savedUser ? savedUser : null;
+  });
 
-  const handleLogout = () => {
+  const handleLogin = useCallback(
+    (value: LoginResponsePayload) => {
+      try {
+        console.log(value);
+        setUser(value);
+        setItem(value);
+      } catch (e) {
+        console.error("Error during login:", e);
+        setUser(null);
+        setItem(null);
+      }
+    },
+    [setItem]
+  );
+
+  const handleLogout = useCallback(() => {
     setUser(null);
     removeItem();
     queryClient.clear();
-  };
+  }, [removeItem, queryClient]);
 
   useEffect(() => {
     const credentials = getItem();
-
     if (credentials) {
-      setUser(credentials as unknown as User);
-      navigate("/");
+      setUser(credentials);
+    } else {
+      setUser(null);
     }
-  }, [getItem, navigate]);
+  }, [getItem]);
+
+  const contextValue = useMemo(
+    () => ({
+      user,
+      handleLogin,
+      handleLogout,
+    }),
+    [user, handleLogin, handleLogout]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

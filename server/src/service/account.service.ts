@@ -84,6 +84,7 @@ class AccountService {
     );
 
     return {
+      credentials: payload,
       accessToken,
       refreshToken,
     };

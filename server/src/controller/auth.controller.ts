@@ -25,14 +25,14 @@ class AccountController {
 
   login = expressAsyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { accessToken, refreshToken } =
+      const { credentials, accessToken, refreshToken } =
         await this.accountService.loginAccount(req.body);
 
       req.session.accessToken = accessToken;
       req.session.refreshToken = refreshToken;
 
       res.status(200).json({
-        accessToken,
+        payload: credentials,
         message: "Login successfully",
       });
     }

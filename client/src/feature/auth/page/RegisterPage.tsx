@@ -11,7 +11,10 @@ import { AccountValidation } from "@/feature/shared/validation/account.validatio
 import { DatePickerField } from "@/common/components/form/DatePickerField";
 import useMutate from "@/common/hooks/useMutate";
 import { PublicAxios } from "@/common/lib/axios/axios.instance";
+import { useNavigate } from "react-router-dom";
+
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const form = useForm<IAccount>({
     defaultValues: {
       firstName: "",
@@ -23,12 +26,13 @@ const RegisterPage = () => {
     resolver: zodResolver(AccountValidation),
   });
 
-  const { isPending, mutate } = useMutate({
+  const { isPending, mutate } = useMutate<IAccount>({
     mutationKey: ["account-registration"],
     mutationFn: async (value: IAccount) =>
-      await PublicAxios.post("/register", value),
-    onSuccess: (values) => {
-      console.log("Created sucecssfully", values);
+      await PublicAxios.post("/auth/register", value),
+    onSuccess: () => {
+      form.reset();
+      navigate("/");
     },
   });
 
