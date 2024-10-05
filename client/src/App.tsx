@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { RouterProvider } from "react-router-dom";
 import authRoutes from "@/feature/auth/routes";
-import { useAuth } from "./common/provider/AuthProvider";
 import userRoutes from "@/feature/user/routes";
 import { useMemo } from "react";
+import useAccountStore from "./feature/shared/store/useAccountStore";
 
 const App = () => {
-  const { user } = useAuth();
-  const currentRole = useMemo(() => user?.role, [user?.role]);
+  const { credentials } = useAccountStore();
+  const currentRole = useMemo(() => credentials?.role, [credentials?.role]);
 
   const protectedRoutes = {
     user: userRoutes,

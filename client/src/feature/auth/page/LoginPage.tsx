@@ -6,14 +6,12 @@ import { SelectSeparator } from "@/common/components/ui/select";
 import { XStack, YStack } from "@/common/components/ui/stack";
 import useMutate from "@/common/hooks/useMutate";
 import { PublicAxios } from "@/common/lib/axios/axios.instance";
-import { useAuth } from "@/common/provider/AuthProvider";
-import { IAccount, User } from "@/feature/shared/interface";
 import { useForm } from "react-hook-form";
 import { LoginResponse } from "../interfaces";
 import { useNavigate } from "react-router-dom";
+import { Account } from "@/feature/shared/interface";
 
 const LoginPage = () => {
-  const { handleLogin } = useAuth();
   const navigate = useNavigate();
   const form = useForm({
     defaultValues: { email: "bossing@gmail.com", password: "password" },
@@ -21,17 +19,20 @@ const LoginPage = () => {
 
   const { isPending, mutate } = useMutate({
     mutationKey: ["login-account"],
-    mutationFn: async (value: Pick<IAccount, "email" | "password">) =>
+    mutationFn: async (value: Pick<Account, "email" | "password">) =>
       await PublicAxios.post("/auth/login", value),
 
     onSuccess: (value) => {
       const { payload } = value as unknown as LoginResponse;
-      handleLogin(payload);
+
+      console.log(payload);
+
+      // handleLogin(payload);
       navigate("/");
     },
   });
 
-  const onSubmit = (value: Pick<User, "email" | "password">) => {
+  const onSubmit = (value: Pick<Account, "email" | "password">) => {
     mutate(value);
   };
 

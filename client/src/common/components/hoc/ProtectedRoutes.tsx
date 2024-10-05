@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useAuth } from "@/common/provider/AuthProvider";
 import { User } from "@/feature/shared/interface";
+import useAccountStore from "@/feature/shared/store/useAccountStore";
 import { FC, PropsWithChildren, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,21 +9,21 @@ interface Props extends PropsWithChildren {
 }
 
 const ProtectedRoutes: FC<Props> = ({ allowedRoutes, children }) => {
-  const { user: currentUser } = useAuth();
+  const { credentials } = useAccountStore();
   const navigate = useNavigate();
 
   // Check if the user exist
   useEffect(() => {
-    if (currentUser === null) {
+    if (credentials === null) {
       navigate("/");
     }
-  }, [currentUser]);
+  }, [credentials]);
 
   // check of allowed roles
   if (
-    currentUser ||
+    credentials ||
     (allowedRoutes &&
-      !allowedRoutes.includes((currentUser as unknown as User)?.role))
+      !allowedRoutes.includes((credentials as unknown as User)?.role))
   ) {
     return <div>Permission denied</div>;
   }

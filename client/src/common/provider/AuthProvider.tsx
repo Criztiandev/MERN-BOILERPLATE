@@ -1,85 +1,36 @@
-/* eslint-disable react-refresh/only-export-components */
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  createContext,
-  FC,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useMemo,
-  useCallback,
-  useState,
-} from "react";
+import { FC, PropsWithChildren } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { LoginResponsePayload } from "@/feature/auth/interfaces";
-
-interface AuthContextType {
-  user: LoginResponsePayload | null;
-  handleLogin: (value: LoginResponsePayload) => void;
-  handleLogout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
+import useAccountStore from "@/feature/shared/store/useAccountStore";
+import { User } from "@/feature/shared/interface";
+import { ProtectedAxios } from "../lib/axios/axios.instance";
+import LoadingScreen from "../components/utils/LoadingScreen";
+import useUtilReset from "@/feature/shared/hook/useUtilReset";
+import useFetch from "../hooks/useFetch";
 
 const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { setItem, getItem, removeItem } = useLocalStorage("user");
-  const queryClient = useQueryClient();
+  const { setCredentials } = useAccountStore();
+  const { reset } = useUtilReset();
+  const { getItem } = useLocalStorage("user");
 
-  const [user, setUser] = useState<LoginResponsePayload | null>(() => {
-    const savedUser = getItem();
-    return savedUser ? savedUser : null;
+  const storedUser = getItem() as User | null;
+
+  const { isLoading, isError } = useFetch({
+    queryKey: [`account-${storedUser?.id}`],
+    queryFn: async () => {
+      const { data } = await ProtectedAxios.get("/account/profile");
+      return 
+    },
+    retry: 1,
+    enabled: !!storedUser?.id,
   });
 
-  const handleLogin = useCallback(
-    (value: LoginResponsePayload) => {
-      try {
-        console.log(value);
-        setUser(value);
-        setItem(value);
-      } catch (e) {
-        console.error("Error during login:", e);
-        setUser(null);
-        setItem(null);
-      }
-    },
-    [setItem]
-  );
+  if (isLoading) return <LoadingScreen />;
+  if (isError) {
+    reset();
+  }
 
-  const handleLogout = useCallback(() => {
-    setUser(null);
-    removeItem();
-    queryClient.clear();
-  }, [removeItem, queryClient]);
-
-  useEffect(() => {
-    const credentials = getItem();
-    if (credentials) {
-      setUser(credentials);
-    } else {
-      setUser(null);
-    }
-  }, [getItem]);
-
-  const contextValue = useMemo(
-    () => ({
-      user,
-      handleLogin,
-      handleLogout,
-    }),
-    [user, handleLogin, handleLogout]
-  );
-
-  return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-  );
+  return children;
 };
 
 export default AuthProvider;

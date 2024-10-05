@@ -28,7 +28,10 @@ const protectedRoute = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const sessionData = await extractSessionData(req);
 
-    if (!sessionData) throw new Error("Invalid action, No session data found");
+    if (!sessionData) {
+      res.status(401);
+      throw new Error("Invalid action, No session data found");
+    }
 
     const { accessToken, refreshToken } = sessionData;
 
